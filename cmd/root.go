@@ -10,8 +10,8 @@ import (
 
 var root = &cobra.Command{
 	Use:   "boil",
-	Short: "Boilerplate and template manager",
-	Long:  "A fancy boilerplate and template manager for all your development needs",
+	Short: "A boilerplate manager",
+	Long:  "A fancy boilerplate manager for all your development needs",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("TheBoiler: boilerplate and template management with ease")
 		fmt.Printf("Type `%v` for a list of commands\n", color.GreenString("boil help"))
