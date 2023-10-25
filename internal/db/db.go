@@ -3,18 +3,35 @@ package db
 import (
 	"errors"
 	"fmt"
-	"log"
 	"os/user"
 	"path/filepath"
 	"runtime"
 	"time"
 
-	helpers "github.com/RATIU5/theboiler/internal"
 	"go.etcd.io/bbolt"
 )
 
 const appDBPath = "theboiler/storage/data.db"
 
+// Get the storage path of the DB on MacOS systems
+func getMacPath(homeDir string) string {
+	dbPath := filepath.Join(homeDir, fmt.Sprintf("Library/Application Support/%s", appDBPath))
+	return dbPath
+}
+
+// Get the storage path of the DB on Linux systems
+func getLinuxPath(homeDir string) string {
+	dbPath := filepath.Join(homeDir, fmt.Sprintf(".local/share/%s", appDBPath))
+	return dbPath
+}
+
+// Get the storage path of the DB on Windows systems
+func getWindowsPath(homeDir string) string {
+	dbPath := filepath.Join(homeDir, fmt.Sprintf("AppData/Local/%s", appDBPath))
+	return dbPath
+}
+
+// Get the storage path of the DB for any supported platform
 func GetDBPath() (string, error) {
 	usr, err := user.Current()
 	if err != nil {
@@ -35,32 +52,17 @@ func GetDBPath() (string, error) {
 	}
 }
 
-func getMacPath(homeDir string) string {
-	dbPath := filepath.Join(homeDir, fmt.Sprintf("Library/Application Support/%s", appDBPath))
-	return dbPath
-}
-
-func getLinuxPath(homeDir string) string {
-	dbPath := filepath.Join(homeDir, fmt.Sprintf(".local/share/%s", appDBPath))
-	return dbPath
-}
-
-func getWindowsPath(homeDir string) string {
-	dbPath := filepath.Join(homeDir, fmt.Sprintf("AppData/Local/%s", appDBPath))
-	return dbPath
-}
-
-func OpenDB() {
-	path, err := helpers.GetDBPath()
+// Open and return the database connection, if the database doesn't exist, then create it
+func OpenDB() (*bbolt.DB, error) {
+	path, err := GetDBPath()
 	if err != nil {
-		log.Fatal(err)
-		return
+		return nil, err
 	}
 
 	db, err := bbolt.Open(path, 0600, &bbolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
-	defer db.Close()
+	return db, nil
 }
