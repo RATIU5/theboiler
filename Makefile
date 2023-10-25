@@ -1,13 +1,13 @@
 OUT := boil
 PKG := github.com/RATIU5/theboiler
-VERSION := $(shell git describe --always --long --dirty)
+VERSION := 0.0.1
 PKG_LIST := $(shell go list ${PKG}/... | grep -v /vendor/)
 GO_FILES := $(shell find . -name '*.go' | grep -v /vendor/)
 
 all: run
 
 server:
-	go build -v -o ${OUT} -ldflags="-X main.version=${VERSION}" ${PKG}
+	go build -v -o ${OUT} -ldflags="-X github.com/RATIU5/theboiler/internal.Version=${VERSION}" ${PKG}
 
 test:
 	@go test -short ${PKG_LIST}
