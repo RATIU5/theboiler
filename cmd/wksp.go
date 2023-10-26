@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/RATIU5/theboiler/internal/db"
-	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
 
@@ -13,12 +12,15 @@ var cmdWksp = &cobra.Command{
 	Short: "List or change the current workspace",
 	Long:  "Groups of similar templates are split into workspaces. View or change the current workspace with this command",
 	Run: func(cmd *cobra.Command, args []string) {
-		val, err := db.GetCurrentWorkspace()
-		if err != nil {
-			fmt.Printf("%s: %v\n", color.RedString("error"), err)
-			return
+		if len(args) == 0 {
+			val, err := db.GetCurrentWorkspace()
+			if err != nil {
+				fmt.Println("There is no workspace set. Set one with `boil wksp [name]`")
+			} else {
+				fmt.Printf("%s\n", val)
+			}
 		} else {
-			fmt.Printf("%s", val)
+			fmt.Printf("Added workspace '%s'", args[0])
 		}
 	},
 }

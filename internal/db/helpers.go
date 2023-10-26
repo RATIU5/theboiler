@@ -55,7 +55,7 @@ func CreatePath(path string) error {
 	// others can read and execute, but not write
 	err := os.MkdirAll(path, 0755)
 	if err != nil {
-		return err
+		return errors.New(fmt.Sprintf("failed to create directory '%s'", path))
 	}
 	return nil
 }
