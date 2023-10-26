@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/RATIU5/theboiler/internal/db"
+	"github.com/RATIU5/theboiler/pkg/db"
 	"github.com/spf13/cobra"
 )
 

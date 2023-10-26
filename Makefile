@@ -1,4 +1,4 @@
-OUT := boil
+OUT := build/boil
 PKG := github.com/RATIU5/theboiler
 VERSION := 0.0.1
 PKG_LIST := $(shell go list ${PKG}/... | grep -v /vendor/)
@@ -7,7 +7,7 @@ GO_FILES := $(shell find . -name '*.go' | grep -v /vendor/)
 all: run
 
 server:
-	go build -v -o ${OUT} -ldflags="-X github.com/RATIU5/theboiler/internal.Version=${VERSION}" ${PKG}
+	go build -v -o ${OUT} -ldflags="-X github.com/RATIU5/theboiler/version.Version=${VERSION}" ${PKG}
 
 test:
 	@go test -short ${PKG_LIST}
@@ -21,7 +21,7 @@ lint:
 	done
 
 static: vet lint
-	go build -i -v -o ${OUT}-v${VERSION} -tags netgo -ldflags="-extldflags \"-static\" -w -s -X internal.version=${VERSION}" ${PKG}
+	go build -i -v -o ${OUT}-v${VERSION} -ldflags="-extldflags \"-static\" -w -s -X version.Version=${VERSION}" ${PKG}
 
 run: server
 	./${OUT}
