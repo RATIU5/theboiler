@@ -8,7 +8,7 @@ import (
 )
 
 func TestGetDBPath(t *testing.T) {
-	path, err := GetDBPath()
+	path, err := GetAppPath()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -29,7 +29,7 @@ func TestGetMacPath(t *testing.T) {
 	}
 
 	path := getMacPath(usr.HomeDir)
-	expectedPath := filepath.Join(usr.HomeDir, "Library/Application Support", appDBPath)
+	expectedPath := filepath.Join(usr.HomeDir, "Library/Application Support", APP_PATH)
 
 	if path != expectedPath {
 		t.Fatalf("expected %s but got %s", expectedPath, path)
@@ -47,7 +47,7 @@ func TestGetLinuxPath(t *testing.T) {
 	}
 
 	path := getLinuxPath(usr.HomeDir)
-	expectedPath := filepath.Join(usr.HomeDir, ".local/share", appDBPath)
+	expectedPath := filepath.Join(usr.HomeDir, ".local/share", APP_PATH)
 
 	if path != expectedPath {
 		t.Fatalf("expected %s but got %s", expectedPath, path)
@@ -65,7 +65,7 @@ func TestGetWindowsPath(t *testing.T) {
 	}
 
 	path := getWindowsPath(usr.HomeDir)
-	expectedPath := filepath.Join(usr.HomeDir, "AppData/Local", appDBPath)
+	expectedPath := filepath.Join(usr.HomeDir, "AppData/Local", APP_PATH)
 
 	if path != expectedPath {
 		t.Fatalf("expected %s but got %s", expectedPath, path)
