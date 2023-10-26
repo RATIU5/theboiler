@@ -1,4 +1,4 @@
-package fs
+package utils
 
 import (
 	"errors"
@@ -7,6 +7,10 @@ import (
 	"os/user"
 	"path/filepath"
 	"runtime"
+)
+
+const (
+	APP_PATH = "theboiler/data"
 )
 
 // Get the storage path of the DB on MacOS systems

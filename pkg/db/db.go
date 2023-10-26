@@ -10,7 +10,6 @@ import (
 )
 
 const (
-	APP_PATH       = "theboiler/data"
 	DB_FILENAME    = "data.db"
 	DB_BUCKET_CORE = "Core"
 )
