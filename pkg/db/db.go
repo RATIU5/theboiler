@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"time"
 
+	fs "github.com/RATIU5/theboiler/pkg/utils"
 	"go.etcd.io/bbolt"
 )
 
@@ -18,13 +19,13 @@ const (
 //
 // Make sure to close the connection after you are done using it.
 func OpenDB() (*bbolt.DB, error) {
-	path, err := GetAppPath()
+	path, err := fs.GetAppPath()
 	if err != nil {
 		return nil, err
 	}
 
 	// Create the app directory if it doesn't exist
-	err = CreatePath(path)
+	err = fs.CreatePath(path)
 	if err != nil {
 		return nil, err
 	}
