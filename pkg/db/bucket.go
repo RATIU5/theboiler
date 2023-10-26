@@ -33,14 +33,12 @@ func CreateBucketIfNotExist(db *bbolt.DB, bucketName string) error {
 
 // Finds a value from the provided key stored in the provided bucket. If the there is no key, an error will be returned.
 func ViewValueInBucket(db *bbolt.DB, bucketName string, keyName string) (string, error) {
-	err := CreateBucketIfNotExist(db, bucketName)
-	if err != nil {
-		return "", err
-	}
-
 	var val string
-	err = db.View(func(tx *bbolt.Tx) error {
-		b := tx.Bucket([]byte(bucketName))
+	err := db.View(func(tx *bbolt.Tx) error {
+		b, err := tx.CreateBucketIfNotExists([]byte(bucketName))
+		if err != nil {
+			return errors.New(fmt.Sprintf("bucket name '%s' is empty or too long", bucketName))
+		}
 		if b == nil {
 			return errors.New(fmt.Sprintf("bucket '%s' created but not found", bucketName))
 		}
@@ -53,10 +51,33 @@ func ViewValueInBucket(db *bbolt.DB, bucketName string, keyName string) (string,
 
 		return nil
 	})
-
 	if err != nil {
 		return "", err
 	}
 
 	return val, nil
+}
+
+func SetValueInBucket(db *bbolt.DB, bucketName string, keyName string, value string) error {
+	err := db.Update(func(tx *bbolt.Tx) error {
+		b, err := tx.CreateBucketIfNotExists([]byte(bucketName))
+		if err != nil {
+			return errors.New(fmt.Sprintf("bucket name '%s' is empty or too long", bucketName))
+		}
+		if b == nil {
+			return errors.New(fmt.Sprintf("bucket '%s' created but not found", bucketName))
+		}
+
+		err = b.Put([]byte(keyName), []byte(value))
+		if err != nil {
+			return errors.New(fmt.Sprintf("key '%s' is too long or value '%s' is too long", keyName, value))
+		}
+
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
