@@ -12,11 +12,21 @@ var (
 	isVerbose bool
 	cmdWksp   = &cobra.Command{
 		Use:   "wksp",
-		Short: "List or change the current workspace",
+		Short: "Show or change the current workspace",
 		Long:  "Groups of similar templates are split into workspaces. View or change the current workspace with this command",
 		Run: func(cmd *cobra.Command, args []string) {
 			res := handleCommand(cmd, args, isVerbose)
 			fmt.Println(res)
+		},
+	}
+	cmdWkspLs = &cobra.Command{
+		Use:   "ls",
+		Short: "List all workspaces",
+		Long:  "View all the workspaces that have been used",
+		Run: func(cmd *cobra.Command, args []string) {
+			// res := handleLsCommand(cmd, args, isVerbose)
+			// fmt.Println(res)
+			fmt.Println("Test")
 		},
 	}
 )
@@ -24,6 +34,7 @@ var (
 func init() {
 	// The signature of BoolVarP is: BoolVarP(p *bool, name, shorthand string, value bool, usage string)
 	cmdWksp.Flags().BoolVarP(&isVerbose, "verbose", "v", false, "Output verbose messages")
+	cmdWksp.AddCommand(cmdWkspLs)
 	root.AddCommand(cmdWksp)
 }
 
