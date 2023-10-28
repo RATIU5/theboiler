@@ -33,7 +33,16 @@ func handleCommand(cmd *cobra.Command, args []string, isVerbose bool) string {
 	if len(args) > 1 {
 		output = "Too many arguments provided"
 	} else if len(args) == 1 {
-		output = fmt.Sprintf("Workspace set to '%s'", args[0])
+		err := db.SetCurrentWorkspace(args[0])
+		if err != nil {
+			if isVerbose {
+				output = fmt.Sprintf("%s: %s", color.RedString("error"), err)
+			} else {
+				output = "Failed to set workspace"
+			}
+		} else {
+			output = fmt.Sprintf("Set workspace to '%s'", args[0])
+		}
 	} else {
 		val, err := db.GetCurrentWorkspace()
 		if err != nil {
@@ -43,7 +52,7 @@ func handleCommand(cmd *cobra.Command, args []string, isVerbose bool) string {
 				output = "There is no workspace set. Set one with `boil wksp [name]`"
 			}
 		} else {
-			fmt.Printf("%s\n", val)
+			output = fmt.Sprintf("%s", val)
 		}
 	}
 

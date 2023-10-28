@@ -11,7 +11,7 @@ import (
 
 const (
 	DB_FILENAME    = "data.db"
-	DB_BUCKET_CORE = "Core"
+	DB_BUCKET_CORE = "core"
 )
 
 // Open and return the database connection, if the database doesn't exist, then create it.

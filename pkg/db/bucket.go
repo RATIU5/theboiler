@@ -34,7 +34,7 @@ func CreateBucketIfNotExist(db *bbolt.DB, bucketName string) error {
 // Finds a value from the provided key stored in the provided bucket. If the there is no key, an error will be returned.
 func ViewValueInBucket(db *bbolt.DB, bucketName string, keyName string) (string, error) {
 	var val string
-	err := db.View(func(tx *bbolt.Tx) error {
+	err := db.Update(func(tx *bbolt.Tx) error {
 		b, err := tx.CreateBucketIfNotExists([]byte(bucketName))
 		if err != nil {
 			return errors.New(fmt.Sprintf("bucket name '%s' is empty or too long", bucketName))
