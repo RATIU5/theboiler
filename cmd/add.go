@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/RATIU5/theboiler/pkg/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -27,25 +28,39 @@ func init() {
 	root.AddCommand(cmdAdd)
 }
 
+type Item struct {
+	itemType  string
+	itemName  string
+	itemValue string
+}
+
 func handleAddCommand(cmd *cobra.Command, args []string) string {
 	var output string
-	if len(args) == 0 {
-		cwd, err := os.Getwd()
-		if err != nil {
-			output = "failed to get current working directory"
-		}
-		err = filepath.Walk(cwd,
-			func(path string, info os.FileInfo, err error) error {
-				if err != nil {
-					return err // if there's an error, stop and report
-				}
-				fmt.Println(path)
+	cwd, err := os.Getwd()
+	if err != nil {
+		output = "failed to get current working directory"
+	}
+	err = filepath.Walk(cwd,
+		func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+
+			if utils.IsExcludedDir(path, []string{
+				".git",
+			}) {
+				return nil // Skip if excluded
+			}
+
+			if utils.IsExcludedFile(path, []string{}) {
 				return nil
-			})
-		if err != nil {
-			fmt.Printf("error walking the path %q: %v\n", cwd, err)
-		}
-		output = cwd
+			}
+
+			fmt.Println(path)
+			return nil
+		})
+	if err != nil {
+		fmt.Printf("error walking the path %q: %v\n", cwd, err)
 	}
 
 	return output

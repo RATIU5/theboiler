@@ -7,6 +7,7 @@ import (
 	"os/user"
 	"path/filepath"
 	"runtime"
+	"strings"
 )
 
 const (
@@ -62,4 +63,23 @@ func CreatePath(path string) error {
 		return errors.New(fmt.Sprintf("failed to create directory '%s'", path))
 	}
 	return nil
+}
+
+func IsExcludedDir(path string, excludedDirs []string) bool {
+	for _, dir := range excludedDirs {
+		excludePath := dir + string(os.PathSeparator)
+		if strings.Contains(path, excludePath) || strings.HasSuffix(path, dir) {
+			return true
+		}
+	}
+	return false
+}
+
+func IsExcludedFile(path string, excludedFiles []string) bool {
+	for _, file := range excludedFiles {
+		if filepath.Base(path) == file {
+			return true
+		}
+	}
+	return false
 }
