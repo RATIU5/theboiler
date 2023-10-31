@@ -3,20 +3,21 @@ package item
 import "fmt"
 
 type Item struct {
-	isDir     bool
-	path      string
-	value     string
-	workspace string
+	IsDir     bool
+	Path      string
+	Value     string
+	Workspace string
 }
 
 func New(isDir bool, path string, value string) *Item {
-	return &Item{isDir: isDir, path: path, value: value}
+	return &Item{IsDir: isDir, Path: path, Value: value}
 }
 
 func (i *Item) Print() {
-	if i.isDir {
-		fmt.Printf("%s/\n", i.path)
+	fmt.Printf("%s:\n", i.Workspace)
+	if i.IsDir {
+		fmt.Printf("%s/\n", i.Path)
 	} else {
-		fmt.Printf("%s: %s\n", i.path, i.value)
+		fmt.Printf("%s: %s\n", i.Path, i.Value)
 	}
 }

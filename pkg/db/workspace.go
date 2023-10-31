@@ -4,16 +4,16 @@ const (
 	DB_KEY_WORKSPACE = "workspace"
 )
 
-func GetCurrentWorkspace() (string, error) {
+func GetCurrentWorkspace() ([]byte, error) {
 	db, err := OpenDB()
 	if err != nil {
-		return "", err
+		return []byte(""), err
 	}
 	defer db.Close()
 
-	val, err := ViewValueInBucket(db, DB_BUCKET_CORE, DB_KEY_WORKSPACE)
+	val, err := ViewValueInBucket(db, []byte(DB_BUCKET_CORE), []byte(DB_KEY_WORKSPACE))
 	if err != nil {
-		return "", err
+		return []byte(""), err
 	}
 
 	return val, nil

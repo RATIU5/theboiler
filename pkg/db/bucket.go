@@ -32,10 +32,10 @@ func CreateBucketIfNotExist(db *bbolt.DB, bucketName string) error {
 }
 
 // Finds a value from the provided key stored in the provided bucket. If the there is no key, an error will be returned.
-func ViewValueInBucket(db *bbolt.DB, bucketName string, keyName string) (string, error) {
-	var val string
+func ViewValueInBucket(db *bbolt.DB, bucketName []byte, keyName []byte) ([]byte, error) {
+	var val []byte
 	err := db.Update(func(tx *bbolt.Tx) error {
-		b, err := tx.CreateBucketIfNotExists([]byte(bucketName))
+		b, err := tx.CreateBucketIfNotExists(bucketName)
 		if err != nil {
 			return errors.New(fmt.Sprintf("failed to create bucket: %s", err))
 		}
@@ -43,16 +43,16 @@ func ViewValueInBucket(db *bbolt.DB, bucketName string, keyName string) (string,
 			return errors.New(fmt.Sprintf("bucket '%s' created but not found", bucketName))
 		}
 
-		v := b.Get([]byte(keyName))
+		v := b.Get(keyName)
 		if v == nil {
 			return errors.New(fmt.Sprintf("key '%s' not found in bucket '%s'", keyName, bucketName))
 		}
-		val = string(v)
+		val = v
 
 		return nil
 	})
 	if err != nil {
-		return "", err
+		return []byte(""), err
 	}
 
 	return val, nil

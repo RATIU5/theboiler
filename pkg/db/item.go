@@ -8,7 +8,7 @@ import (
 )
 
 func StoreItems(name []byte, items []item.Item) error {
-	buffer, err := encode(items)
+	buffer, err := encodeItem(items)
 	if err != nil {
 		return err
 	}
@@ -19,7 +19,7 @@ func StoreItems(name []byte, items []item.Item) error {
 	}
 	defer db.Close()
 
-	err = SetValueInBucket(db, []byte(DB_BUCKET_CORE), []byte(name), buffer.Bytes())
+	err = SetValueInBucket(db, []byte(DB_BUCKET_CORE), []byte(name), buffer)
 	if err != nil {
 		return err
 	}
@@ -27,12 +27,41 @@ func StoreItems(name []byte, items []item.Item) error {
 	return nil
 }
 
-func encode(items []item.Item) (bytes.Buffer, error) {
+func ReadItem(name []byte) ([]item.Item, error) {
+	db, err := OpenDB()
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
+
+	encData, err := ViewValueInBucket(db, []byte(DB_BUCKET_CORE), name)
+	if err != nil {
+		return nil, err
+	}
+
+	items, err := decodeItem(encData)
+	if err != nil {
+		return nil, err
+	}
+
+	return items, nil
+}
+
+func encodeItem(items []item.Item) ([]byte, error) {
 	var buffer bytes.Buffer
 	enc := gob.NewEncoder(&buffer)
 	err := enc.Encode(items)
+	return buffer.Bytes(), err
+}
+
+func decodeItem(encodedData []byte) ([]item.Item, error) {
+	var buffer bytes.Buffer
+	buffer.Write(encodedData)
+	var decodedItems []item.Item
+	dec := gob.NewDecoder(&buffer)
+	err := dec.Decode(&decodedItems)
 	if err != nil {
-		return buffer, err
+		return nil, err
 	}
-	return buffer, nil
+	return decodedItems, nil
 }
