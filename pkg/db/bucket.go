@@ -58,9 +58,9 @@ func ViewValueInBucket(db *bbolt.DB, bucketName string, keyName string) (string,
 	return val, nil
 }
 
-func SetValueInBucket(db *bbolt.DB, bucketName string, keyName string, value string) error {
+func SetValueInBucket(db *bbolt.DB, bucketName []byte, keyName []byte, value []byte) error {
 	err := db.Update(func(tx *bbolt.Tx) error {
-		b, err := tx.CreateBucketIfNotExists([]byte(bucketName))
+		b, err := tx.CreateBucketIfNotExists(bucketName)
 		if err != nil {
 			return errors.New(fmt.Sprintf("failed to create bucket: %s", err))
 		}
@@ -68,7 +68,7 @@ func SetValueInBucket(db *bbolt.DB, bucketName string, keyName string, value str
 			return errors.New(fmt.Sprintf("bucket '%s' created but not found", bucketName))
 		}
 
-		err = b.Put([]byte(keyName), []byte(value))
+		err = b.Put(keyName, value)
 		if err != nil {
 			return errors.New(fmt.Sprintf("failed to update '%s': %s", keyName, err))
 		}

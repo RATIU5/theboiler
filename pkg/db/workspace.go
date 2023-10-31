@@ -26,7 +26,7 @@ func SetCurrentWorkspace(value string) error {
 	}
 	defer db.Close()
 
-	err = SetValueInBucket(db, DB_BUCKET_CORE, DB_KEY_WORKSPACE, value)
+	err = SetValueInBucket(db, []byte(DB_BUCKET_CORE), []byte(DB_KEY_WORKSPACE), []byte(value))
 	if err != nil {
 		return err
 	}

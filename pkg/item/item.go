@@ -3,9 +3,10 @@ package item
 import "fmt"
 
 type Item struct {
-	isDir bool
-	path  string
-	value string
+	isDir     bool
+	path      string
+	value     string
+	workspace string
 }
 
 func New(isDir bool, path string, value string) *Item {
