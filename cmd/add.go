@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/RATIU5/theboiler/pkg/item"
 	"github.com/RATIU5/theboiler/pkg/utils"
 	"github.com/spf13/cobra"
 )
@@ -26,12 +27,6 @@ var (
 
 func init() {
 	root.AddCommand(cmdAdd)
-}
-
-type Item struct {
-	itemType  string
-	itemName  string
-	itemValue string
 }
 
 func handleAddCommand(cmd *cobra.Command, args []string) string {
@@ -56,7 +51,21 @@ func handleAddCommand(cmd *cobra.Command, args []string) string {
 				return nil
 			}
 
-			fmt.Println(path)
+			var itm *item.Item
+			if info.IsDir() {
+				itm = item.New(true, path, "")
+			} else {
+				content, err := utils.ReadFile(path)
+				if err != nil {
+					return err
+				}
+				itm = item.New(false, path, content)
+			}
+
+			if info.IsDir() {
+				itm.Print()
+			}
+
 			return nil
 		})
 	if err != nil {

@@ -83,3 +83,11 @@ func IsExcludedFile(path string, excludedFiles []string) bool {
 	}
 	return false
 }
+
+func ReadFile(path string) (string, error) {
+	content, err := os.ReadFile(path)
+	if err != nil {
+		return "", err
+	}
+	return string(content), nil
+}
