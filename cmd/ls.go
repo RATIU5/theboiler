@@ -31,6 +31,12 @@ func handleLsCommand(cmd *cobra.Command, args []string) {
 		return
 	}
 
+	_, err := db.GetCurrentWorkspace()
+	if err != nil {
+		fmt.Println("no workspace is selected")
+		return
+	}
+
 	name := []byte(args[0])
 
 	items, err := db.ReadItem(name)

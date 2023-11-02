@@ -34,13 +34,10 @@ func CreateBucketIfNotExist(db *bbolt.DB, bucketName string) error {
 // Finds a value from the provided key stored in the provided bucket. If the there is no key, an error will be returned.
 func ViewValueInBucket(db *bbolt.DB, bucketName []byte, keyName []byte) ([]byte, error) {
 	var val []byte
-	err := db.Update(func(tx *bbolt.Tx) error {
-		b, err := tx.CreateBucketIfNotExists(bucketName)
-		if err != nil {
-			return errors.New(fmt.Sprintf("failed to create bucket: %s", err))
-		}
+	err := db.View(func(tx *bbolt.Tx) error {
+		b := tx.Bucket(bucketName)
 		if b == nil {
-			return errors.New(fmt.Sprintf("bucket '%s' created but not found", bucketName))
+			return errors.New(fmt.Sprintf("bucket '%s' not found", bucketName))
 		}
 
 		v := b.Get(keyName)
@@ -60,15 +57,12 @@ func ViewValueInBucket(db *bbolt.DB, bucketName []byte, keyName []byte) ([]byte,
 
 func SetValueInBucket(db *bbolt.DB, bucketName []byte, keyName []byte, value []byte) error {
 	err := db.Update(func(tx *bbolt.Tx) error {
-		b, err := tx.CreateBucketIfNotExists(bucketName)
-		if err != nil {
-			return errors.New(fmt.Sprintf("failed to create bucket: %s", err))
-		}
+		b := tx.Bucket(bucketName)
 		if b == nil {
 			return errors.New(fmt.Sprintf("bucket '%s' created but not found", bucketName))
 		}
 
-		err = b.Put(keyName, value)
+		err := b.Put(keyName, value)
 		if err != nil {
 			return errors.New(fmt.Sprintf("failed to update '%s': %s", keyName, err))
 		}

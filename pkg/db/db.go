@@ -1,7 +1,6 @@
 package db
 
 import (
-	"errors"
 	"path/filepath"
 	"time"
 
@@ -32,9 +31,5 @@ func OpenDB() (*bbolt.DB, error) {
 	path = filepath.Join(path, DB_FILENAME)
 
 	db, err := bbolt.Open(path, 0600, &bbolt.Options{Timeout: 1 * time.Second})
-	if err != nil {
-		return nil, errors.New("failed to create a connection to the database")
-	}
-
-	return db, nil
+	return db, err
 }

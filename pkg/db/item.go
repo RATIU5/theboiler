@@ -8,7 +8,7 @@ import (
 )
 
 func StoreItems(name []byte, items []item.Item) error {
-	buffer, err := encodeItem(items)
+	buffer, err := encodeItems(items)
 	if err != nil {
 		return err
 	}
@@ -18,6 +18,11 @@ func StoreItems(name []byte, items []item.Item) error {
 		return err
 	}
 	defer db.Close()
+
+	coreExists := DoesBucketExist(db, DB_BUCKET_CORE)
+	if !coreExists {
+		CreateBucketIfNotExist(db, DB_BUCKET_CORE)
+	}
 
 	err = SetValueInBucket(db, []byte(DB_BUCKET_CORE), []byte(name), buffer)
 	if err != nil {
@@ -34,12 +39,17 @@ func ReadItem(name []byte) ([]item.Item, error) {
 	}
 	defer db.Close()
 
+	coreExists := DoesBucketExist(db, DB_BUCKET_CORE)
+	if !coreExists {
+		CreateBucketIfNotExist(db, DB_BUCKET_CORE)
+	}
+
 	encData, err := ViewValueInBucket(db, []byte(DB_BUCKET_CORE), name)
 	if err != nil {
 		return nil, err
 	}
 
-	items, err := decodeItem(encData)
+	items, err := decodeItems(encData)
 	if err != nil {
 		return nil, err
 	}
@@ -47,14 +57,53 @@ func ReadItem(name []byte) ([]item.Item, error) {
 	return items, nil
 }
 
-func encodeItem(items []item.Item) ([]byte, error) {
+func SetAndReadEncodedValue(items []item.Item) error {
+	buffer, err := encodeItems(items)
+	if err != nil {
+		return err
+	}
+
+	db, err := OpenDB()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	coreExists := DoesBucketExist(db, DB_BUCKET_CORE)
+	if !coreExists {
+		CreateBucketIfNotExist(db, DB_BUCKET_CORE)
+	}
+
+	err = SetValueInBucket(db, []byte(DB_BUCKET_CORE), []byte("test"), buffer)
+	if err != nil {
+		return err
+	}
+
+	encData, err := ViewValueInBucket(db, []byte(DB_BUCKET_CORE), []byte("test"))
+	if err != nil {
+		return err
+	}
+
+	itms, err := decodeItems(encData)
+	if err != nil {
+		return err
+	}
+
+	for _, itm := range itms {
+		itm.Print()
+	}
+
+	return nil
+}
+
+func encodeItems(items []item.Item) ([]byte, error) {
 	var buffer bytes.Buffer
 	enc := gob.NewEncoder(&buffer)
 	err := enc.Encode(items)
 	return buffer.Bytes(), err
 }
 
-func decodeItem(encodedData []byte) ([]item.Item, error) {
+func decodeItems(encodedData []byte) ([]item.Item, error) {
 	var buffer bytes.Buffer
 	buffer.Write(encodedData)
 	var decodedItems []item.Item
