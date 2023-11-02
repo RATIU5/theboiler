@@ -8,5 +8,9 @@ type Group struct {
 }
 
 func (i *Group) Print() {
-	fmt.Printf("%s")
+	fmt.Printf("%s:\n", i.Name)
+	for _, itm := range i.Items {
+		fmt.Print("  ")
+		itm.Print()
+	}
 }
