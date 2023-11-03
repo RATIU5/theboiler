@@ -41,7 +41,7 @@ environment behind the scenes.`,
 			log.Fatalf("error: failed to create bucket. reason: %s", err)
 		}
 
-		err = db.SetItemInBucket(dtbs, db.BUCKET_NAME_CORE, db.BUCKET_KEY_INIT, []byte(name))
+		err = db.SetStringInBucket(dtbs, db.BUCKET_NAME_CORE, db.BUCKET_KEY_INIT, name)
 		if err != nil {
 			log.Fatalf("error: failed to assign value in bucket. reason: %s", err)
 		}

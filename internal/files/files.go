@@ -15,7 +15,7 @@ const (
 
 // Returns true or false if a path exists. If another error
 // from calling os.Stat than ErrNotExist, false is returned
-func DoesPathExist(path []byte) bool {
+func DoesPathExist(path string) bool {
 	if _, err := os.Stat(path); err == nil {
 		return true
 	} else if errors.Is(err, os.ErrNotExist) {
@@ -29,7 +29,7 @@ func DoesPathExist(path []byte) bool {
 // forward slash, it will be created as a directory. If
 // no forward slash is found, a file will be created.
 // An error type is returned
-func CreatePath(path []byte) error {
+func CreatePath(path string) error {
 	isDir := path[len(path)-1:] == "/"
 	if isDir {
 		err := os.Mkdir(path, os.ModePerm)
@@ -50,7 +50,7 @@ func CreatePath(path []byte) error {
 // Retrieve the database file path. Will be located on mac
 // in the Library/Application Support folder, windows in the
 // AppData/Local folder, and on Linux in the .local/share folder
-func GetDatabasePath() []byte {
+func GetDatabasePath() string {
 	home, err := os.UserHomeDir()
 	if err != nil {
 		log.Fatalf("error: failed to get home directory. reason: %s\n", err)
@@ -66,5 +66,5 @@ func GetDatabasePath() []byte {
 		path = filepath.Join(home, ".local/share", APP_PATH, DATABASE_FILEPATH)
 	}
 
-	return []byte(path)
+	return path
 }
