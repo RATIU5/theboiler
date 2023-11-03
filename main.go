@@ -1,6 +1,5 @@
 /*
-Copyright © 2023 NAME HERE <EMAIL ADDRESS>
-
+Copyright © 2023 RATIU5 contact@ratiu5.dev
 */
 package main
 

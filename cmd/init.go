@@ -6,6 +6,8 @@ package cmd
 import (
 	"log"
 
+	"github.com/RATIU5/theboiler/internal/db"
+	"github.com/RATIU5/theboiler/internal/files"
 	"github.com/spf13/cobra"
 )
 
@@ -21,24 +23,25 @@ environment behind the scenes.`,
 		}
 		name := args[0]
 
-		if !files.DoesPathExist(db.DB_FILEPATH) {
-			err := files.CreatePath(db.DB_FILEPATH)
+		if !files.DoesPathExist(files.GetDatabasePath()) {
+			err := files.CreatePath(files.GetDatabasePath())
 			if err != nil {
 				log.Fatalf("error: failed to create the database. reason: %s", err)
 			}
 		}
 
-		dtbs, err := OpenDB(db.DB_FILEPATH)
+		dtbs, err := db.OpenDB(files.GetDatabasePath())
 		if err != nil {
 			log.Fatalf("error: failed to open the database. reason: %s", err)
 		}
+		defer dtbs.Close()
 
-		err = db.CreateBucketIfNotExist(dtbs, db.BUCKET_CORE)
+		err = db.CreateBucketIfNotExist(dtbs, db.BUCKET_NAME_CORE)
 		if err != nil {
 			log.Fatalf("error: failed to create bucket. reason: %s", err)
 		}
 
-		err = db.SetItemInBucket(dtbs, db.BUCKET_CORE, db.VALUE_KEY, []byte(name))
+		err = db.SetItemInBucket(dtbs, db.BUCKET_NAME_CORE, db.BUCKET_KEY_INIT, []byte(name))
 		if err != nil {
 			log.Fatalf("error: failed to assign value in bucket. reason: %s", err)
 		}
