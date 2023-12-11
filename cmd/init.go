@@ -42,12 +42,12 @@ environment behind the scenes.`,
 		}
 		defer dtbs.Close()
 
-		err = db.CreateBucketIfNotExist(dtbs, db.BUCKET_NAME_CORE)
+		err = db.CreateBucketIfNotExist(dtbs, []byte(db.BUCKET_NAME_CORE))
 		if err != nil {
 			log.Fatalf("error: failed to create bucket. reason: %s", err)
 		}
 
-		err = db.SetStringInBucket(dtbs, db.BUCKET_NAME_CORE, db.BUCKET_KEY_INIT, name)
+		err = db.SetBytesInBucket(dtbs, []byte(db.BUCKET_NAME_CORE), []byte(db.BUCKET_KEY_INIT), []byte(name))
 		if err != nil {
 			log.Fatalf("error: failed to assign value in bucket. reason: %s", err)
 		}

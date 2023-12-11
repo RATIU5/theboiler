@@ -1,27 +1,43 @@
 package db
 
 import (
-	"errors"
 	"fmt"
 
 	"go.etcd.io/bbolt"
 )
 
-func CreateBucketIfNotExist(db *bbolt.DB, name string) error {
+func CreateBucketIfNotExist(db *bbolt.DB, name []byte) error {
 	return db.Update(func(tx *bbolt.Tx) error {
 		_, err := tx.CreateBucketIfNotExists([]byte(name))
 		return err
 	})
 }
 
-func SetStringInBucket(db *bbolt.DB, bucket string, key string, value string) error {
+func SetBytesInBucket(db *bbolt.DB, bucket []byte, key []byte, value []byte) error {
 	return db.Update(func(tx *bbolt.Tx) error {
-		b := tx.Bucket([]byte(bucket))
+		b := tx.Bucket(bucket)
 		if b == nil {
-			return errors.New(fmt.Sprintf("failed to open bucket '%s'", bucket))
+			return fmt.Errorf("failed to open bucket '%s'", bucket)
 		}
 
-		err := b.Put([]byte(key), []byte(value))
+		err := b.Put(key, value)
 		return err
 	})
+}
+
+func GetBytesInBucket(db *bbolt.DB, bucket []byte, key []byte) ([]byte, error) {
+	var value []byte
+	err := db.View(func(tx *bbolt.Tx) error {
+		b := tx.Bucket(bucket)
+		if b == nil {
+			return fmt.Errorf("failed to open bucket '%s'", bucket)
+		}
+
+		value = b.Get(key)
+		return nil
+	})
+	if err != nil {
+		return []byte(""), err
+	}
+	return value, nil
 }

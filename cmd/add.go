@@ -31,11 +31,6 @@ This command takes at least 1 argument.`,
 			return
 		}
 
-		_, err := db.OpenDB(files.GetDatabasePath())
-		if err != nil {
-			log.Fatalf("error: failed to read database. reason: %s\n", err)
-		}
-
 		excludedFiles := []string{".git", ".DS_Store", "build"}
 		res, err := files.GetFileList(files.GetWorkingDirectory(), excludedFiles)
 		if err != nil {
@@ -47,8 +42,24 @@ This command takes at least 1 argument.`,
 			log.Fatalf("error: failed to get file content. reason: %s\n", err)
 		}
 
-		for _, content := range fileContent {
-			fmt.Println(content.String())
+		dbc, err := db.OpenDB(files.GetDatabasePath())
+		if err != nil {
+			log.Fatalf("error: failed to read database. reason: %s\n", err)
+		}
+
+		name, err := db.GetBytesInBucket(dbc, []byte(db.BUCKET_NAME_CORE), []byte(db.BUCKET_KEY_INIT))
+		if err != nil {
+			log.Fatalf("error: failed to read database. reason: %s\n", err)
+		}
+
+		encodedData, err := utils.Encode(fileContent)
+		if err != nil {
+			log.Fatalf("error: failed to encode data. reason: %s\n", err)
+		}
+
+		err = db.SetBytesInBucket(dbc, []byte(db.BUCKET_NAME_CORE), name, encodedData)
+		if err != nil {
+			log.Fatalf("error: failed to write database. reason: %s\n", err)
 		}
 
 	},
