@@ -29,28 +29,21 @@ func DoesPathExist(path string) bool {
 // forward slash, it will be created as a directory. If
 // no forward slash is found, a file will be created.
 // An error type is returned
-func CreatePath(path string) error {
-	isDir := path[len(path)-1:] == "/"
-	if isDir {
-		err := os.Mkdir(path, os.ModePerm)
-		if err != nil {
-			return err
-		}
-		return nil
-	} else {
-		file, err := os.Create(path)
-		defer file.Close()
-		if err != nil {
-			return err
-		}
-		return nil
-	}
+func CreateDirPath(path string) error {
+	return os.MkdirAll(path, 0755)
 }
 
-// Retrieve the database file path. Will be located on mac
-// in the Library/Application Support folder, windows in the
+// Retrieve the database file path. Will be located on Mac
+// in the Library/Application Support folder, Windows in the
 // AppData/Local folder, and on Linux in the .local/share folder
 func GetDatabasePath() string {
+	return filepath.Join(GetApplicationPath(), DATABASE_FILEPATH)
+}
+
+// Retrieve the application path. Will be located on Mac
+// in the Library/Application Support folder, Windows in the
+// AppData/Local folder, and on Linux in the .local/share folder
+func GetApplicationPath() string {
 	home, err := os.UserHomeDir()
 	if err != nil {
 		log.Fatalf("error: failed to get home directory. reason: %s\n", err)
@@ -59,11 +52,11 @@ func GetDatabasePath() string {
 	var path string
 	switch os := runtime.GOOS; os {
 	case "darwin":
-		path = filepath.Join(home, "Library/Application Support", APP_PATH, DATABASE_FILEPATH)
+		path = filepath.Join(home, "Library/Application Support", APP_PATH)
 	case "windows":
-		path = filepath.Join(home, "AppData/Local", APP_PATH, DATABASE_FILEPATH)
+		path = filepath.Join(home, "AppData/Local", APP_PATH)
 	case "linux":
-		path = filepath.Join(home, ".local/share", APP_PATH, DATABASE_FILEPATH)
+		path = filepath.Join(home, ".local/share", APP_PATH)
 	}
 
 	return path

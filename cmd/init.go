@@ -4,6 +4,7 @@ Copyright © 2023 RATIU5 contact@ratiu5.dev
 package cmd
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/RATIU5/theboiler/internal/db"
@@ -19,12 +20,17 @@ a given name. This will setup a new boilerplate/template
 environment behind the scenes.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) < 1 {
-			log.Fatal("You didn't specify any additional arguments. A name for the boilerplate was expected.")
+			fmt.Println("You didn't specify any additional arguments. A name for the boilerplate was expected.")
+			return
+		}
+		if len(args) > 1 {
+			fmt.Println("Too many arguments were provided. Only a name for the boilerplate was expected.")
+			return
 		}
 		name := args[0]
 
-		if !files.DoesPathExist(files.GetDatabasePath()) {
-			err := files.CreatePath(files.GetDatabasePath())
+		if !files.DoesPathExist(files.GetApplicationPath()) {
+			err := files.CreateDirPath(files.GetApplicationPath())
 			if err != nil {
 				log.Fatalf("error: failed to create the database. reason: %s", err)
 			}
@@ -45,6 +51,8 @@ environment behind the scenes.`,
 		if err != nil {
 			log.Fatalf("error: failed to assign value in bucket. reason: %s", err)
 		}
+
+		fmt.Printf("Initialized a new boilerplate '%s'\n", name)
 	},
 }
 
