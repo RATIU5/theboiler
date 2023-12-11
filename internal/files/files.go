@@ -1,11 +1,13 @@
 package files
 
 import (
+	"bufio"
 	"errors"
 	"log"
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 )
 
 const (
@@ -60,4 +62,84 @@ func GetApplicationPath() string {
 	}
 
 	return path
+}
+
+// Get the current working directory
+func GetWorkingDirectory() string {
+	dir, err := os.Getwd()
+	if err != nil {
+		log.Fatalf("error: failed to get working directory. reason: %s\n", err)
+	}
+	return dir
+}
+
+// Get a list of files and folders in a directory
+func GetFileList(path string, excludedFiles []string) ([]string, error) {
+	var files []string
+
+	err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
+		if path == "." || path == "./" {
+			return nil
+		}
+
+		for _, excludedFile := range excludedFiles {
+			if strings.Contains(path, excludedFile) {
+				return nil
+			}
+		}
+
+		files = append(files, path)
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return files, nil
+}
+
+func GetFileContent(path string) (FileContent, error) {
+	var fileContent FileContent
+	fileContent.Path = path
+
+	file, err := os.Open(path)
+	if err != nil {
+		return fileContent, err
+	}
+	defer file.Close()
+
+	// Skip if the file is a directory
+	if info, err := file.Stat(); err == nil && info.IsDir() {
+		fileContent.IsDir = true
+		return fileContent, nil
+	} else {
+		fileContent.IsDir = false
+	}
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		fileContent.Content = append(fileContent.Content, scanner.Text())
+	}
+
+	if err := scanner.Err(); err != nil {
+		return fileContent, err
+	}
+
+	return fileContent, nil
+}
+
+// Get all the content of many files
+func GetFilesContent(paths []string) ([]FileContent, error) {
+	var fileContent []FileContent
+
+	for _, path := range paths {
+		content, err := GetFileContent(path)
+		if err != nil {
+			return nil, err
+		}
+		fileContent = append(fileContent, content)
+	}
+
+	return fileContent, nil
 }

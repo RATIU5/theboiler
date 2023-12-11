@@ -26,8 +26,8 @@ This command takes at least 1 argument.`,
 			return
 		}
 
-		if utils.IsDot(args[0]) {
-			fmt.Println("Added directory")
+		if !utils.IsDot(args[0]) {
+			fmt.Println("Can only add the current directory.")
 			return
 		}
 
@@ -36,7 +36,21 @@ This command takes at least 1 argument.`,
 			log.Fatalf("error: failed to read database. reason: %s\n", err)
 		}
 
-		
+		excludedFiles := []string{".git", ".DS_Store", "build"}
+		res, err := files.GetFileList(files.GetWorkingDirectory(), excludedFiles)
+		if err != nil {
+			log.Fatalf("error: failed to get file list. reason: %s\n", err)
+		}
+
+		fileContent, err := files.GetFilesContent(res)
+		if err != nil {
+			log.Fatalf("error: failed to get file content. reason: %s\n", err)
+		}
+
+		for _, content := range fileContent {
+			fmt.Println(content.String())
+		}
+
 	},
 }
 
