@@ -9,6 +9,7 @@ import (
 const (
 	BUCKET_NAME_CORE = "core"
 	BUCKET_KEY_INIT  = "init-name"
+	BUCKET_KEY_FILES = "files"
 )
 
 func OpenDB(path string) (*bbolt.DB, error) {
