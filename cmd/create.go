@@ -14,12 +14,10 @@ import (
 )
 
 // addCmd represents the add command
-var addCmd = &cobra.Command{
-	Use:   "add",
-	Short: "Add file(s) to an initialized boilerplate",
-	Long: `Add any number of files and folders to an
-initialized boilerplate. 
-This command takes at least 1 argument.`,
+var createCmd = &cobra.Command{
+	Use:   "create",
+	Short: "Create a boilerplate",
+	Long:  `Create a new boilerplate from the current directory. The name of the boilerplate is required.`,
 	Run: func(cmd *cobra.Command, args []string) {
 
 		boilerplateName, err := cmd.Flags().GetString("boilerplate")
@@ -56,7 +54,7 @@ This command takes at least 1 argument.`,
 }
 
 func init() {
-	rootCmd.AddCommand(addCmd)
+	rootCmd.AddCommand(createCmd)
 
 	// Here you will define your flags and configuration settings.
 
@@ -66,5 +64,5 @@ func init() {
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	addCmd.Flags().StringP("boilerplate", "b", "", "The boilerplate to store the current directory to")
+	createCmd.Flags().StringP("boilerplate", "b", "", "The boilerplate to store the current directory to")
 }
