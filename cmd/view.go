@@ -25,12 +25,9 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		boilerplateName, err := cmd.Flags().GetString("boilerplate")
-		if err != nil {
-			log.Fatalf("error: failed to retrieve 'boilerplate' flag value. reason: %s\n", err)
-		}
-
-		if boilerplateName == "" {
-			log.Fatal("error: boilerplate name is required")
+		if err != nil || boilerplateName == "" {
+			fmt.Println("a boilerplate name was expected, none received.")
+			return
 		}
 
 		dbc, err := db.OpenDB(files.GetDatabasePath())
@@ -39,7 +36,16 @@ to quickly create a Cobra application.`,
 			return
 		}
 
-		encodedData, err := db.ReadFromCore(dbc, []byte(boilerplateName), []byte(db.BUCKET_KEY_FILES))
+		if !db.DoesCoreBucketExist(dbc) {
+			db.CreateCoreBucket(dbc)
+		}
+
+		if !db.DoesBoilerplateExist(dbc, []byte(boilerplateName)) {
+			fmt.Printf("boilerplate '%s' does not exist\n", boilerplateName)
+			return
+		}
+
+		encodedData, err := db.ReadBoilerplate(dbc, []byte(boilerplateName))
 		if err != nil {
 			log.Fatalf("error: failed to read database. reason: %s\n", err)
 			return

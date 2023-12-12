@@ -4,6 +4,7 @@ Copyright © 2023 RATIU5 contact@ratiu5.dev
 package cmd
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/RATIU5/theboiler/internal/db"
@@ -22,12 +23,8 @@ This command takes at least 1 argument.`,
 	Run: func(cmd *cobra.Command, args []string) {
 
 		boilerplateName, err := cmd.Flags().GetString("boilerplate")
-		if err != nil {
-			log.Fatalf("error: failed to retrieve 'boilerplate' flag value. reason: %s\n", err)
-		}
-
-		if boilerplateName == "" {
-			log.Fatal("error: boilerplate name is required")
+		if err != nil || boilerplateName == "" {
+			fmt.Println("a boilerplate name was expected, none received.")
 		}
 
 		excludedFiles := []string{".git", ".DS_Store", "build"}
@@ -51,7 +48,7 @@ This command takes at least 1 argument.`,
 			log.Fatalf("error: failed to encode data. reason: %s\n", err)
 		}
 
-		err = db.WriteInCore(dbc, []byte(boilerplateName), []byte(db.BUCKET_KEY_FILES), encodedData)
+		err = db.WriteBoilerplate(dbc, []byte(boilerplateName), encodedData)
 		if err != nil {
 			log.Fatalf("error: failed to write database. reason: %s\n", err)
 		}
