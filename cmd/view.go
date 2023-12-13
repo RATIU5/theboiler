@@ -41,7 +41,7 @@ to quickly create a Cobra application.`,
 		}
 
 		if !db.DoesBoilerplateExist(dbc, []byte(boilerplateName)) {
-			fmt.Printf("boilerplate '%s' does not exist.\nAdd one with 'boil create -b <name>'", boilerplateName)
+			fmt.Printf("boilerplate '%s' does not exist.\nadd one with 'boil create -b <name>'\n", boilerplateName)
 			return
 		}
 
