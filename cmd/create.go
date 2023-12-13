@@ -41,6 +41,11 @@ var createCmd = &cobra.Command{
 			log.Fatalf("error: failed to read database. reason: %s\n", err)
 		}
 
+		if db.DoesBoilerplateExist(dbc, []byte(boilerplateName)) {
+			fmt.Printf("boilerplate '%s' already exists.\n", boilerplateName)
+			return
+		}
+
 		encodedData, err := utils.Encode(fileContent)
 		if err != nil {
 			log.Fatalf("error: failed to encode data. reason: %s\n", err)

@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+
+	"github.com/RATIU5/theboiler/internal/utils"
 )
 
 const (
@@ -78,7 +80,9 @@ func GetFileList(path string, excludedFiles []string) ([]string, error) {
 	var files []string
 
 	err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
-		if path == "." || path == "./" {
+		path = strings.Replace(path, GetWorkingDirectory(), "", 1)
+		path = utils.RemoveFirstRune(path)
+		if path == "" || path == "." || path == "./" {
 			return nil
 		}
 
@@ -142,4 +146,12 @@ func GetFilesContent(paths []string) ([]FileContent, error) {
 	}
 
 	return fileContent, nil
+}
+
+func CreateDir(path string) error {
+	return os.MkdirAll(path, 0755)
+}
+
+func CreateFile(path string, content []string) error {
+	return nil
 }

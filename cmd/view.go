@@ -16,13 +16,8 @@ import (
 // viewCmd represents the view command
 var viewCmd = &cobra.Command{
 	Use:   "view",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "View the contents of a boilerplate",
+	Long:  `View all the contents of each file and directory in a boilerplate.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		boilerplateName, err := cmd.Flags().GetString("boilerplate")
 		if err != nil || boilerplateName == "" {
