@@ -55,6 +55,8 @@ var createCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("error: failed to write database. reason: %s\n", err)
 		}
+
+		fmt.Printf("boilerplate '%s' created.\n", boilerplateName)
 	},
 }
 

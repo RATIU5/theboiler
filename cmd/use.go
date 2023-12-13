@@ -6,6 +6,7 @@ package cmd
 import (
 	"fmt"
 	"log"
+	"path/filepath"
 
 	"github.com/RATIU5/theboiler/internal/db"
 	"github.com/RATIU5/theboiler/internal/files"
@@ -18,12 +19,24 @@ var useCmd = &cobra.Command{
 	Use:   "use",
 	Short: "Use a boilerplate to start your project.",
 	Long: `Setup your project with a specific boilerplate.
-This command will copy all the files and directories from the boilerplate to the current directory.`,
+This command will copy all the files and directories from the boilerplate to the current directory or a specified directory.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		boilerplateName, err := cmd.Flags().GetString("boilerplate")
 		if err != nil || boilerplateName == "" {
 			fmt.Println("a boilerplate name was expected, none received.")
 			return
+		}
+
+		if len(args) == 0 || args[0] == "" {
+			fmt.Println("target directory was expected, none received.")
+			return
+		}
+		targetDir := args[0]
+
+		if utils.IsDot(targetDir) {
+			targetDir = files.GetWorkingDirectory()
+		} else {
+			targetDir = filepath.Join(files.GetWorkingDirectory(), targetDir)
 		}
 
 		dbc, err := db.OpenDB(files.GetDatabasePath())
@@ -47,20 +60,22 @@ This command will copy all the files and directories from the boilerplate to the
 			return
 		}
 
-		fileContent, err := utils.Decode[[]files.FileContent](encodedData)
+		filesContent, err := utils.Decode[[]files.FileContent](encodedData)
 		if err != nil {
 			fmt.Printf("error: failed to decode data. reason: %s\n", err)
 			return
 		}
 
-		for _, file := range fileContent {
+		for _, file := range filesContent {
+			targetPath := filepath.Join(targetDir, file.Path)
+
 			if file.IsDir {
-				err := files.CreateDir(file.Path)
+				err := files.CreateDir(targetPath)
 				if err != nil {
 					log.Fatalf("error: failed to create directory. reason: %s\n", err)
 				}
 			} else {
-				err := files.CreateFile(file.Path, file.Content)
+				err := files.CreateFile(targetPath, file.Content)
 				if err != nil {
 					log.Fatalf("error: failed to create file. reason: %s\n", err)
 				}
