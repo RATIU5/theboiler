@@ -153,5 +153,20 @@ func CreateDir(path string) error {
 }
 
 func CreateFile(path string, content []string) error {
-	return nil
+	file, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	writer := bufio.NewWriter(file)
+
+	for _, line := range content {
+		_, err := writer.WriteString(line + "\n")
+		if err != nil {
+			return err
+		}
+	}
+
+	return writer.Flush()
 }
